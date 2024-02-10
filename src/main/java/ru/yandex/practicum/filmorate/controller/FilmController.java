@@ -18,10 +18,10 @@ import java.util.List;
 @RequestMapping("/films")
 @Slf4j
 public class FilmController {
+    private static final Integer MAX_DESCRIPTION_LENGTH = 200;
+    private static final LocalDate MIN_RELEASE_DATE = LocalDate.of(1895, Month.DECEMBER, 28);
     private final HashMap<Integer, Film>  films = new HashMap<>();  // хранение фильмов в системе
     private Integer idCounter = 1; //счетчик id
-    private final static Integer MAX_DESCRIPTION_LENGTH = 200;
-    private final static LocalDate MIN_RELEASE_DATE = LocalDate.of(1895, Month.DECEMBER, 28);
 
     /**
      * получение списка всех фильмов.
@@ -41,7 +41,7 @@ public class FilmController {
 
         validate(film);
 
-        if (idFilm != null && films.containsKey(idFilm)){
+        if (idFilm != null && films.containsKey(idFilm)) {
             log.error("Фильм с id = {}  уже есть в системе", idFilm);
             throw new ValidationException("Фильм уже существует");
         }
@@ -66,11 +66,11 @@ public class FilmController {
         Integer id = film.getId();
 
         validate(film);
-        if (id == null){
+        if (id == null) {
             log.error("Id фильма не заполнен");
             throw new ValidationException("Для обновления данных фильма надо указать его Id");
         }
-        if (!films.containsKey(id)){
+        if (!films.containsKey(id)) {
             log.error("Фильм с Id = {} не существует", id);
             throw new ValidationException("Фильм с таким Id не существует");
         }
@@ -81,7 +81,7 @@ public class FilmController {
         return films.get(id);
     }
 
-    private Integer getUniqueId(){
+    private Integer getUniqueId() {
         // вычисление уникального Id
         Integer result = idCounter;
         idCounter++;
@@ -94,19 +94,19 @@ public class FilmController {
         Long duration = film.getDuration();
         String name = film.getName();
 
-        if(name.isBlank()){
+        if (name.isBlank()) {
             log.error("название не может быть пустым");
             throw new ValidationException("название не может быть пустым");
         }
-        if (description != null && description.length() > MAX_DESCRIPTION_LENGTH){
+        if (description != null && description.length() > MAX_DESCRIPTION_LENGTH) {
             log.error("Размер описания фильма {} символов", film.getDescription().length());
             throw new ValidationException("максимальная длина описания — 200 символов");
         }
-        if (releaseDate != null && releaseDate.isBefore(MIN_RELEASE_DATE)){
+        if (releaseDate != null && releaseDate.isBefore(MIN_RELEASE_DATE)) {
             log.error("Дата релиза {}", film.getReleaseDate());
             throw new ValidationException("дата релиза — не раньше 28 декабря 1895 года");
         }
-        if (duration != null && duration <= 0){
+        if (duration != null && duration <= 0) {
             log.error("Продолжительность фильма {} минут", film.getDuration());
             throw new ValidationException("продолжительность фильма должна быть положительной");
         }
