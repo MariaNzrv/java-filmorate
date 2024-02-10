@@ -40,7 +40,7 @@ public class UserController {
 
         validate(user);
 
-        if (idUser != null && users.containsKey(idUser)){
+        if (idUser != null && users.containsKey(idUser)) {
             log.error("Пользователь с id = {} уже есть в системе", idUser);
             throw new UserAlreadyExistException("Пользователь уже существует");
         }
@@ -65,11 +65,11 @@ public class UserController {
         Integer id = user.getId();
 
         validate(user);
-        if (id == null){
+        if (id == null) {
             log.error("Id не заполнен");
             throw new ValidationException("Для обновления данных пользователя надо указать его Id");
         }
-        if (!users.containsKey(id)){
+        if (!users.containsKey(id)) {
             log.error("Пользователя с Id = {} не существует", id);
             throw new ValidationException("Пользователя с таким Id не существует");
         }
@@ -80,7 +80,7 @@ public class UserController {
         return users.get(id);
     }
 
-    private Integer getUniqueId(){
+    private Integer getUniqueId() {
         // вычисление уникального Id
         Integer result = idCounter;
         idCounter++;
@@ -90,19 +90,19 @@ public class UserController {
     private static void validate(User user) {
         String email = user.getEmail();
         String login = user.getLogin();
-        if (email.isBlank() || email.indexOf('@') == -1){
+        if (email.isBlank() || email.indexOf('@') == -1) {
             log.error("Эл. почта: {}", email);
             throw new ValidationException("Электронная почта не может быть пустой и должна содержать символ @");
         }
-        if (login.isBlank()){
+        if (login.isBlank()) {
             log.error("Логин: {}", login);
             throw new ValidationException("Логин не может содержать пробелы");
         }
-        if (user.getBirthday() != null && user.getBirthday().isAfter(LocalDate.now())){
+        if (user.getBirthday() != null && user.getBirthday().isAfter(LocalDate.now())) {
             log.error("Дата рождения: {}", user.getBirthday());
             throw new ValidationException("Дата рождения не может быть в будущем");
         }
-        if (user.getName() == null || user.getName().isBlank()){
+        if (user.getName() == null || user.getName().isBlank()) {
             user.setName(login);
         }
     }
