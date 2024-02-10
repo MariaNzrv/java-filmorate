@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class UserControllerTest {
     @Test
     void userValidateOk() {
-        User user = new User("mail@ya.ru","pika");
+        User user = new User("mail@ya.ru", "pika");
         UserController userController = new UserController();
 
         user.setBirthday(LocalDate.of(1995, Month.SEPTEMBER, 24));
@@ -25,8 +25,8 @@ class UserControllerTest {
     }
 
     @Test
-    void userEmptyLogin(){
-        User user = new User("mail@ya.ru","");
+    void userEmptyLogin() {
+        User user = new User("mail@ya.ru", "");
         UserController userController = new UserController();
 
         user.setBirthday(LocalDate.of(1995, Month.SEPTEMBER, 24));
@@ -39,8 +39,8 @@ class UserControllerTest {
     }
 
     @Test
-    void userEmptyEmail(){
-        User user = new User("","pika");
+    void userEmptyEmail() {
+        User user = new User("", "pika");
         UserController userController = new UserController();
 
         user.setBirthday(LocalDate.of(1995, Month.SEPTEMBER, 24));
@@ -53,8 +53,8 @@ class UserControllerTest {
     }
 
     @Test
-    void userEmailWithoutDog(){
-        User user = new User("mail","pika");
+    void userEmailWithoutDog() {
+        User user = new User("mail", "pika");
         UserController userController = new UserController();
 
         user.setBirthday(LocalDate.of(1995, Month.SEPTEMBER, 24));
@@ -67,8 +67,8 @@ class UserControllerTest {
     }
 
     @Test
-    void userBadBirthday(){
-        User user = new User("mail@ya.ru","pika");
+    void userBadBirthday() {
+        User user = new User("mail@ya.ru", "pika");
         UserController userController = new UserController();
 
         user.setBirthday(LocalDate.of(2995, Month.SEPTEMBER, 24));
@@ -82,7 +82,7 @@ class UserControllerTest {
 
     @Test
     void userEmptyName() {
-        User user = new User("mail@ya.ru","pika");
+        User user = new User("mail@ya.ru", "pika");
         UserController userController = new UserController();
 
         user.setBirthday(LocalDate.of(1995, Month.SEPTEMBER, 24));
@@ -95,14 +95,14 @@ class UserControllerTest {
 
     @Test
     void createUserWithExistId() {
-        User user = new User("mail@ya.ru","pika");
+        User user = new User("mail@ya.ru", "pika");
         UserController userController = new UserController();
 
         user.setBirthday(LocalDate.of(1995, Month.SEPTEMBER, 24));
         user.setName("Пикачу");
 
         User user1 = userController.create(user);
-        User user2 = new User("mail2@ya.ru","pika2");
+        User user2 = new User("mail2@ya.ru", "pika2");
         user2.setBirthday(LocalDate.of(1995, Month.SEPTEMBER, 24));
         user2.setName("Пикачу2");
         user2.setId(1);
@@ -113,14 +113,14 @@ class UserControllerTest {
 
     @Test
     void updateUserWithoutId() {
-        User user = new User("mail@ya.ru","pika");
+        User user = new User("mail@ya.ru", "pika");
         UserController userController = new UserController();
 
         user.setBirthday(LocalDate.of(1995, Month.SEPTEMBER, 24));
         user.setName("Пикачу");
 
         User user1 = userController.create(user);
-        User user2 = new User("mail2@ya.ru","pika");
+        User user2 = new User("mail2@ya.ru", "pika");
         user2.setBirthday(LocalDate.of(1998, Month.SEPTEMBER, 14));
         user2.setName("Пикачу2");
         ValidationException ex = assertThrows(ValidationException.class, () -> userController.update(user2));
@@ -130,14 +130,14 @@ class UserControllerTest {
 
     @Test
     void updateUserWithUnknownId() {
-        User user = new User("mail@ya.ru","pika");
+        User user = new User("mail@ya.ru", "pika");
         UserController userController = new UserController();
 
         user.setBirthday(LocalDate.of(1995, Month.SEPTEMBER, 24));
         user.setName("Пикачу");
 
         User user1 = userController.create(user);
-        User user2 = new User("mail2@ya.ru","pika");
+        User user2 = new User("mail2@ya.ru", "pika");
         user2.setBirthday(LocalDate.of(1998, Month.SEPTEMBER, 14));
         user2.setName("Пикачу2");
         user2.setId(34);
@@ -148,14 +148,14 @@ class UserControllerTest {
 
     @Test
     void updateUserOk() {
-        User user = new User("mail@ya.ru","pika");
+        User user = new User("mail@ya.ru", "pika");
         UserController userController = new UserController();
 
         user.setBirthday(LocalDate.of(1995, Month.SEPTEMBER, 24));
         user.setName("Пикачу");
 
         User user1 = userController.create(user);
-        User user2 = new User("mail2@ya.ru","pika");
+        User user2 = new User("mail2@ya.ru", "pika");
         user2.setBirthday(LocalDate.of(1998, Month.SEPTEMBER, 14));
         user2.setName("Пикачу2");
         user2.setId(1);

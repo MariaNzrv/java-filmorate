@@ -27,7 +27,7 @@ class FilmControllerTest {
     }
 
     @Test
-    void filmEmptyName(){
+    void filmEmptyName() {
         Film film = new Film();
         FilmController filmController = new FilmController();
 
@@ -42,7 +42,7 @@ class FilmControllerTest {
     }
 
     @Test
-    void filmBadLongDescriptionLength(){
+    void filmBadLongDescriptionLength() {
         Film film = new Film();
         FilmController filmController = new FilmController();
 
@@ -59,7 +59,7 @@ class FilmControllerTest {
     }
 
     @Test
-    void filmBadReleaseDate(){
+    void filmBadReleaseDate() {
         Film film = new Film();
         FilmController filmController = new FilmController();
 
@@ -74,7 +74,7 @@ class FilmControllerTest {
     }
 
     @Test
-    void filmFirstReleaseDateOk(){
+    void filmFirstReleaseDateOk() {
         Film film = new Film();
         FilmController filmController = new FilmController();
 
@@ -89,7 +89,7 @@ class FilmControllerTest {
     }
 
     @Test
-    void filmWithNegativeDuration(){
+    void filmWithNegativeDuration() {
         Film film = new Film();
         FilmController filmController = new FilmController();
 
@@ -104,7 +104,7 @@ class FilmControllerTest {
     }
 
     @Test
-    void filmWith0Duration(){
+    void filmWith0Duration() {
         Film film = new Film();
         FilmController filmController = new FilmController();
 
@@ -119,7 +119,7 @@ class FilmControllerTest {
     }
 
     @Test
-    void createFilmWithExistId(){
+    void createFilmWithExistId() {
         Film film = new Film();
         FilmController filmController = new FilmController();
 
@@ -143,7 +143,7 @@ class FilmControllerTest {
     }
 
     @Test
-    void updateFilmWithoutId(){
+    void updateFilmWithoutId() {
         Film film = new Film();
         FilmController filmController = new FilmController();
 
@@ -158,7 +158,7 @@ class FilmControllerTest {
     }
 
     @Test
-    void updateFilmWithUnknownId(){
+    void updateFilmWithUnknownId() {
         Film film = new Film();
         FilmController filmController = new FilmController();
 
