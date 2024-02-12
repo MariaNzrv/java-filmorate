@@ -94,24 +94,6 @@ class UserControllerTest {
     }
 
     @Test
-    void createUserWithExistId() {
-        User user = new User("mail@ya.ru", "pika");
-        UserController userController = new UserController();
-
-        user.setBirthday(LocalDate.of(1995, Month.SEPTEMBER, 24));
-        user.setName("Пикачу");
-
-        User user1 = userController.create(user);
-        User user2 = new User("mail2@ya.ru", "pika2");
-        user2.setBirthday(LocalDate.of(1995, Month.SEPTEMBER, 24));
-        user2.setName("Пикачу2");
-        user2.setId(1);
-        UserAlreadyExistException ex = assertThrows(UserAlreadyExistException.class, () -> userController.create(user2));
-
-        assertEquals("Пользователь уже существует", ex.getMessage());
-    }
-
-    @Test
     void updateUserWithoutId() {
         User user = new User("mail@ya.ru", "pika");
         UserController userController = new UserController();

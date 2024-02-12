@@ -35,27 +35,15 @@ public class UserController {
      */
     @PostMapping
     public User create(@RequestBody User user) {
-        Integer idUser = user.getId();
-        Integer id = idUser;
-
         validate(user);
 
-        if (idUser != null && users.containsKey(idUser)) {
-            log.error("Пользователь с id = {} уже есть в системе", idUser);
-            throw new UserAlreadyExistException("Пользователь уже существует");
-        }
+        Integer id = getUniqueId();
 
-        if (idUser == null) {
-            id = getUniqueId();
-        } else {
-            idCounter = id + 1;
-        }
         user.setId(id);
         users.put(id, user);
         log.info("Создан пользователь с Id: '{}'", id);
         return users.get(id);
     }
-
 
     /**
      * обновление пользователя.
@@ -91,15 +79,15 @@ public class UserController {
         String email = user.getEmail();
         String login = user.getLogin();
         if (email.isBlank() || email.indexOf('@') == -1) {
-            log.error("Эл. почта: {}", email);
+            log.warn("Электронная почта не может быть пустой и должна содержать символ @");
             throw new ValidationException("Электронная почта не может быть пустой и должна содержать символ @");
         }
         if (login.isBlank()) {
-            log.error("Логин: {}", login);
+            log.warn("Логин не может содержать пробелы");
             throw new ValidationException("Логин не может содержать пробелы");
         }
         if (user.getBirthday() != null && user.getBirthday().isAfter(LocalDate.now())) {
-            log.error("Дата рождения: {}", user.getBirthday());
+            log.warn("Дата рождения не может быть в будущем");
             throw new ValidationException("Дата рождения не может быть в будущем");
         }
         if (user.getName() == null || user.getName().isBlank()) {

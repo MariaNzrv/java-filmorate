@@ -36,21 +36,10 @@ public class FilmController {
      */
     @PostMapping
     public Film create(@RequestBody Film film) {
-        Integer idFilm = film.getId();
-        Integer id = idFilm;
-
         validate(film);
 
-        if (idFilm != null && films.containsKey(idFilm)) {
-            log.error("Фильм с id = {}  уже есть в системе", idFilm);
-            throw new ValidationException("Фильм уже существует");
-        }
+        Integer id = getUniqueId();
 
-        if (idFilm == null) {
-            id = getUniqueId();
-        } else {
-            idCounter = id + 1;
-        }
         film.setId(id);
         films.put(id, film);
         log.info("Создан фильм с Id: '{}'", id);
@@ -95,19 +84,19 @@ public class FilmController {
         String name = film.getName();
 
         if (name.isBlank()) {
-            log.error("название не может быть пустым");
+            log.warn("название не может быть пустым");
             throw new ValidationException("название не может быть пустым");
         }
         if (description != null && description.length() > MAX_DESCRIPTION_LENGTH) {
-            log.error("Размер описания фильма {} символов", film.getDescription().length());
-            throw new ValidationException("максимальная длина описания — 200 символов");
+            log.warn("Размер описания больше чем {} символов", MAX_DESCRIPTION_LENGTH);
+            throw new ValidationException("максимальная длина описания — "+ MAX_DESCRIPTION_LENGTH +" символов");
         }
         if (releaseDate != null && releaseDate.isBefore(MIN_RELEASE_DATE)) {
-            log.error("Дата релиза {}", film.getReleaseDate());
-            throw new ValidationException("дата релиза — не раньше 28 декабря 1895 года");
+            log.warn("Дата релиза раньше, чем {}", MIN_RELEASE_DATE);
+            throw new ValidationException("дата релиза — не раньше " + MIN_RELEASE_DATE);
         }
         if (duration != null && duration <= 0) {
-            log.error("Продолжительность фильма {} минут", film.getDuration());
+            log.warn("Продолжительность фильма {} минут, а должна быть положительной", film.getDuration());
             throw new ValidationException("продолжительность фильма должна быть положительной");
         }
 
