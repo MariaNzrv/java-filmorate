@@ -89,7 +89,7 @@ public class FilmController {
         }
         if (description != null && description.length() > MAX_DESCRIPTION_LENGTH) {
             log.warn("Размер описания больше чем {} символов", MAX_DESCRIPTION_LENGTH);
-            throw new ValidationException("максимальная длина описания — "+ MAX_DESCRIPTION_LENGTH +" символов");
+            throw new ValidationException("максимальная длина описания — " + MAX_DESCRIPTION_LENGTH + " символов");
         }
         if (releaseDate != null && releaseDate.isBefore(MIN_RELEASE_DATE)) {
             log.warn("Дата релиза раньше, чем {}", MIN_RELEASE_DATE);
