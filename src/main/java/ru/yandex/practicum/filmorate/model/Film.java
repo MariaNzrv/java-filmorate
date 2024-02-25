@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 /**
  * Фильм.
@@ -18,6 +19,7 @@ public class Film {
     private String description; //описание
     private LocalDate releaseDate; // дата релиза
     private Long duration; // продолжительность фильма
+    private Set<Integer> likes; // список лайков (состоит из Id пользоваелей, которым понравился фильм)
 
 
 }
