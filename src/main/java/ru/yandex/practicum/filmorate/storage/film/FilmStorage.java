@@ -7,10 +7,10 @@ import java.util.List;
 public interface FilmStorage {
 
     //создание фильма
-    Film create (Film film);
+    Film create(Film film);
 
     //обновление фильма
-    Film update (Film film);
+    Film update(Film film);
 
     //получение всех фильмов
     List<Film> findAll();
