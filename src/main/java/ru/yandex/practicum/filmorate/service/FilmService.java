@@ -29,7 +29,7 @@ public class FilmService {
     }
 
     // добавление лайка
-    public void addLike(Integer filmId, Integer userId){
+    public void addLike(Integer filmId, Integer userId) {
         if (filmStorage.isFilmExist(filmId)) {
             Film film = filmStorage.findById(filmId);
             if (userStorage.isUserExist(userId)) {
@@ -52,7 +52,7 @@ public class FilmService {
     }
 
     // удаление лайка
-    public void removeLike(Integer filmId, Integer userId){
+    public void removeLike(Integer filmId, Integer userId) {
         if (filmStorage.isFilmExist(filmId)) {
             Film film = filmStorage.findById(filmId);
             film.getLikes().remove(userId);
@@ -63,14 +63,14 @@ public class FilmService {
     }
 
     // получение списка фильмов с максимальным кол-вом лайков
-    public List<Film> getMostLikeFilms(Integer count){
+    public List<Film> getMostLikeFilms(Integer count) {
 
         //  заполняем мапу id фильма - кол-во лайков
         TreeMap<Integer, Integer> filmLikes = new TreeMap<>();
-        for (Film film: filmStorage.findAll()){
+        for (Film film : filmStorage.findAll()) {
             Integer likesCount = 0;
-            if (film.getLikes() != null){
-                likesCount =  film.getLikes().size();
+            if (film.getLikes() != null) {
+                likesCount = film.getLikes().size();
             }
             filmLikes.put(film.getId(), likesCount);
         }
@@ -86,13 +86,13 @@ public class FilmService {
                 ));
 
         ArrayList<Film> sortedFilms = new ArrayList<>();
-        if (count == null){
+        if (count == null) {
             count = MAX_COUNT;
         }
         count = Math.min(count, sortedFilmLikes.size());
 
         // собираем список фильмов
-        for (int i = 0; i < count; i++){
+        for (int i = 0; i < count; i++) {
             Map.Entry<Integer, Integer> firstEntry = sortedFilmLikes.entrySet().iterator().next();
             Film film = filmStorage.findById(firstEntry.getKey());
             sortedFilms.add(film);
@@ -101,24 +101,24 @@ public class FilmService {
         return sortedFilms;
     }
 
-    public List<Film> findAllFilms(){
+    public List<Film> findAllFilms() {
         return filmStorage.findAll();
     }
 
-    public Film findFilmById(Integer filmId){
-        if (!filmStorage.isFilmExist(filmId)){
+    public Film findFilmById(Integer filmId) {
+        if (!filmStorage.isFilmExist(filmId)) {
             log.error("Фильм с Id = {} не существует", filmId);
             throw new RuntimeException("Фильма с Id = " + filmId + " не существует");
         }
         return filmStorage.findById(filmId);
     }
 
-    public Film createFilm(Film film){
+    public Film createFilm(Film film) {
         validate(film);
         return filmStorage.create(film);
     }
 
-    public Film updateFilm(Film film){
+    public Film updateFilm(Film film) {
         Integer id = film.getId();
 
         validate(film);

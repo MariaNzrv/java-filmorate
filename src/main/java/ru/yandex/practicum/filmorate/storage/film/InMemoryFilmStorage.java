@@ -10,12 +10,12 @@ import java.util.List;
 
 @Slf4j
 @Component
-public class InMemoryFilmStorage implements FilmStorage{
-    private final HashMap<Integer, Film>  films = new HashMap<>();  // хранение фильмов в системе
+public class InMemoryFilmStorage implements FilmStorage {
+    private final HashMap<Integer, Film> films = new HashMap<>();  // хранение фильмов в системе
     private Integer idCounter = 1; //счетчик id
 
     @Override
-    public Film create (Film film) {
+    public Film create(Film film) {
         Integer id = getUniqueId();
 
         film.setId(id);
@@ -25,7 +25,7 @@ public class InMemoryFilmStorage implements FilmStorage{
     }
 
     @Override
-    public Film update (Film film) {
+    public Film update(Film film) {
         Integer id = film.getId();
 
         films.put(id, film);
@@ -39,15 +39,14 @@ public class InMemoryFilmStorage implements FilmStorage{
     }
 
     @Override
-    public Film findById(Integer filmId){
+    public Film findById(Integer filmId) {
         return films.get(filmId);
     }
 
     @Override
-    public Boolean isFilmExist(Integer filmId){
+    public Boolean isFilmExist(Integer filmId) {
         return films.containsKey(filmId);
     }
-
 
 
     private Integer getUniqueId() {

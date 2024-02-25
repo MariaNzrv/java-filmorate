@@ -10,7 +10,7 @@ import java.util.List;
 
 @Slf4j
 @Component
-public class InMemoryUserStorage implements UserStorage{
+public class InMemoryUserStorage implements UserStorage {
     private final HashMap<Integer, User> users = new HashMap<>();  // хранение пользователей в системе
     private Integer idCounter = 1; //счетчик id
 
@@ -39,12 +39,12 @@ public class InMemoryUserStorage implements UserStorage{
     }
 
     @Override
-    public User findById(Integer userId){
+    public User findById(Integer userId) {
         return users.get(userId);
     }
 
     @Override
-    public Boolean isUserExist(Integer userId){
+    public Boolean isUserExist(Integer userId) {
         return users.containsKey(userId);
     }
 
