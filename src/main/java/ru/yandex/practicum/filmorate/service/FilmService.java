@@ -10,7 +10,10 @@ import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
 import java.time.Month;
-import java.util.*;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -34,13 +37,7 @@ public class FilmService {
             Film film = filmStorage.findById(filmId);
             if (userStorage.isUserExist(userId)) {
                 Set<Integer> filmLikes = film.getLikes();
-                if (filmLikes != null) {
-                    filmLikes.add(userId);
-                } else {
-                    Set<Integer> newLikes = new HashSet<>();
-                    newLikes.add(userId);
-                    film.setLikes(newLikes);
-                }
+                filmLikes.add(userId);
             } else {
                 log.error("Пользователя с Id = {} не существует", userId);
                 throw new RuntimeException("Пользователя с Id = " + userId + " не существует");
@@ -55,7 +52,12 @@ public class FilmService {
     public void removeLike(Integer filmId, Integer userId) {
         if (filmStorage.isFilmExist(filmId)) {
             Film film = filmStorage.findById(filmId);
-            film.getLikes().remove(userId);
+            if (userStorage.isUserExist(userId)) {
+                film.getLikes().remove(userId);
+            } else {
+                log.error("Пользователя с Id = {} не существует", userId);
+                throw new RuntimeException("Пользователя с Id = " + userId + " не существует");
+            }
         } else {
             log.error("Фильм с Id = {} не существует", filmId);
             throw new RuntimeException("Фильма с Id = " + filmId + " не существует");
@@ -65,40 +67,17 @@ public class FilmService {
     // получение списка фильмов с максимальным кол-вом лайков
     public List<Film> getMostLikeFilms(Integer count) {
 
-        //  заполняем мапу id фильма - кол-во лайков
-        TreeMap<Integer, Integer> filmLikes = new TreeMap<>();
-        for (Film film : filmStorage.findAll()) {
-            Integer likesCount = 0;
-            if (film.getLikes() != null) {
-                likesCount = film.getLikes().size();
-            }
-            filmLikes.put(film.getId(), likesCount);
-        }
+        //  создаем отсортированный по убыванию кол-ва лайков список фильмов
+        Comparator<Film> filmComparator = Comparator.comparingInt(f -> f.getLikes().size());
+        TreeSet<Film> filmLikes2 = new TreeSet<>(filmComparator.thenComparing(Film::hashCode).reversed());
+        filmLikes2.addAll(filmStorage.findAll());
 
-        // сортируем мапу по убыванию кол-ва лайков
-        Map<Integer, Integer> sortedFilmLikes = filmLikes.entrySet().stream()
-                .sorted(Comparator.comparingInt(e -> -e.getValue()))
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        Map.Entry::getValue,
-                        (a, b) -> a,
-                        LinkedHashMap::new
-                ));
-
-        ArrayList<Film> sortedFilms = new ArrayList<>();
+        //берем из этого списка нужное кол-во фильмов
         if (count == null) {
             count = MAX_COUNT;
         }
-        count = Math.min(count, sortedFilmLikes.size());
-
-        // собираем список фильмов
-        for (int i = 0; i < count; i++) {
-            Map.Entry<Integer, Integer> firstEntry = sortedFilmLikes.entrySet().iterator().next();
-            Film film = filmStorage.findById(firstEntry.getKey());
-            sortedFilms.add(film);
-            sortedFilmLikes.remove(firstEntry.getKey());
-        }
-        return sortedFilms;
+        count = Math.min(count, filmLikes2.size());
+        return filmLikes2.stream().limit(count).collect(Collectors.toList());
     }
 
     public List<Film> findAllFilms() {

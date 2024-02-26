@@ -9,7 +9,6 @@ import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -24,29 +23,37 @@ public class UserService {
         this.userStorage = userStorage;
     }
 
+    private static void validate(User user) {
+        String email = user.getEmail();
+        String login = user.getLogin();
+        if (email.isBlank() || email.indexOf('@') == -1) {
+            log.warn("Электронная почта не может быть пустой и должна содержать символ @");
+            throw new ValidationException("Электронная почта не может быть пустой и должна содержать символ @");
+        }
+        if (login.isBlank()) {
+            log.warn("Логин не может содержать пробелы");
+            throw new ValidationException("Логин не может содержать пробелы");
+        }
+        if (user.getBirthday() != null && user.getBirthday().isAfter(LocalDate.now())) {
+            log.warn("Дата рождения не может быть в будущем");
+            throw new ValidationException("Дата рождения не может быть в будущем");
+        }
+        if (user.getName() == null || user.getName().isBlank()) {
+            user.setName(login);
+        }
+    }
+
     // добавление в друзья
     public void addFriend(Integer userId, Integer friendId) {
         if (userStorage.isUserExist(userId)) {
             if (userStorage.isUserExist(friendId)) {
                 User user = userStorage.findById(userId);
                 Set<Integer> userFriends = user.getFriends();
-                if (userFriends != null) {
-                    userFriends.add(friendId);
-                } else {
-                    Set<Integer> newFriends = new HashSet<>();
-                    newFriends.add(friendId);
-                    user.setFriends(newFriends);
-                }
+                userFriends.add(friendId);
 
                 User friend = userStorage.findById(friendId);
                 Set<Integer> friendFriends = friend.getFriends();
-                if (friendFriends != null) {
-                    friendFriends.add(userId);
-                } else {
-                    Set<Integer> newFriends = new HashSet<>();
-                    newFriends.add(userId);
-                    friend.setFriends(newFriends);
-                }
+                friendFriends.add(userId);
             } else {
                 log.error("Невозможно добавить в друзья пользователя с Id = {}, его не существует", friendId);
                 throw new RuntimeException("Невозможно добавить в друзья пользователя с Id = " + friendId +
@@ -142,25 +149,5 @@ public class UserService {
             throw new RuntimeException("Пользователя с таким Id не существует");
         }
         return userStorage.update(user);
-    }
-
-    private static void validate(User user) {
-        String email = user.getEmail();
-        String login = user.getLogin();
-        if (email.isBlank() || email.indexOf('@') == -1) {
-            log.warn("Электронная почта не может быть пустой и должна содержать символ @");
-            throw new ValidationException("Электронная почта не может быть пустой и должна содержать символ @");
-        }
-        if (login.isBlank()) {
-            log.warn("Логин не может содержать пробелы");
-            throw new ValidationException("Логин не может содержать пробелы");
-        }
-        if (user.getBirthday() != null && user.getBirthday().isAfter(LocalDate.now())) {
-            log.warn("Дата рождения не может быть в будущем");
-            throw new ValidationException("Дата рождения не может быть в будущем");
-        }
-        if (user.getName() == null || user.getName().isBlank()) {
-            user.setName(login);
-        }
     }
 }
