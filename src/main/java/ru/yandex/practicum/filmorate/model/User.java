@@ -4,6 +4,8 @@ import lombok.Data;
 import lombok.NonNull;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Пользователь.
@@ -18,4 +20,5 @@ public class User {
     private String login; // логин пользователя
     private String name; // имя для отображения
     private LocalDate birthday; // дата рождения
+    private Set<Integer> friends = new HashSet<>(); // список друзей (состоит из Id пользователей, которые считаются друзьями)
 }
