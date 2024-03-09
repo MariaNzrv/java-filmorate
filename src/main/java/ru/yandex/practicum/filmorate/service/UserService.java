@@ -10,13 +10,13 @@ import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Slf4j
 @Service
 public class UserService {
 
     private final UserStorage userStorage;
+    private final FriendshipService friendshipService = new FriendshipService();
 
     @Autowired
     public UserService(UserStorage userStorage) {
@@ -47,13 +47,7 @@ public class UserService {
     public void addFriend(Integer userId, Integer friendId) {
         if (userStorage.isUserExist(userId)) {
             if (userStorage.isUserExist(friendId)) {
-                User user = userStorage.findById(userId);
-                Set<Integer> userFriends = user.getFriends();
-                userFriends.add(friendId);
-
-                User friend = userStorage.findById(friendId);
-                Set<Integer> friendFriends = friend.getFriends();
-                friendFriends.add(userId);
+                friendshipService.addFriendship(userId, friendId);
             } else {
                 log.error("Невозможно добавить в друзья пользователя с Id = {}, его не существует", friendId);
                 throw new RuntimeException("Невозможно добавить в друзья пользователя с Id = " + friendId +
@@ -68,10 +62,8 @@ public class UserService {
     // удаление из друзей
     public void removeFriend(Integer userId, Integer friendId) {
         if (userStorage.isUserExist(userId)) {
-            User user = userStorage.findById(userId);
             if (userStorage.isUserExist(friendId)) {
-                user.getFriends().remove(friendId);
-                userStorage.findById(friendId).getFriends().remove(userId);
+                friendshipService.removeFriendship(userId, friendId);
             } else {
                 log.error("Пользователя с Id = {} не существует", friendId);
                 throw new RuntimeException("Пользователя с Id = " + friendId + " не существует");
@@ -90,7 +82,7 @@ public class UserService {
         }
         User user = userStorage.findById(userId);
         ArrayList<User> userFriends = new ArrayList<>();
-        for (Integer friendId : user.getFriends()) {
+        for (Integer friendId : friendshipService.getFriends(userId)) {
             userFriends.add(userStorage.findById(friendId));
         }
         return userFriends;
@@ -106,8 +98,8 @@ public class UserService {
             log.error("Пользователя с Id = {} не существует", otherUserId);
             throw new RuntimeException("Пользователя с Id = " + otherUserId + " не существует");
         }
-        Set<Integer> userFriendsIds = userStorage.findById(userId).getFriends();
-        Set<Integer> otherUserFriendsIds = userStorage.findById(otherUserId).getFriends();
+        List<Integer> userFriendsIds = friendshipService.getFriends(userId);
+        List<Integer> otherUserFriendsIds = friendshipService.getFriends(otherUserId);
         ArrayList<User> userFriends = new ArrayList<>();
         if (userFriendsIds != null && otherUserFriendsIds != null) {
             for (Integer id : userFriendsIds) {

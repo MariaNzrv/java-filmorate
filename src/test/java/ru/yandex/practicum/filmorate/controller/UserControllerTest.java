@@ -8,7 +8,7 @@ import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
 import java.time.LocalDate;
 import java.time.Month;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -165,10 +165,10 @@ class UserControllerTest {
 
         userService.addFriend(user1.getId(), user2.getId());
 
-        assertNotNull(user1.getFriends(), "Список друзей пуст");
-        assertNotNull(user3.getFriends(), "Список друзей пуст");
-        assertEquals(user1.getFriends().stream().iterator().next(), 2, "Неверный id друга");
-        assertEquals(user3.getFriends().stream().iterator().next(), 1, "Неверный id друга");
+        assertNotNull(userService.getFriends(user1.getId()), "Список друзей пуст");
+        assertNotNull(userService.getFriends(user3.getId()), "Список друзей пуст");
+        assertEquals(userService.getFriends(user1.getId()).get(0).getId(), 2, "Неверный id друга");
+        assertEquals(userService.getFriends(user3.getId()).get(0).getId(), 1, "Неверный id друга");
     }
 
     @Test
@@ -218,8 +218,8 @@ class UserControllerTest {
         userService.addFriend(user1.getId(), user2.getId());
         userService.removeFriend(user1.getId(), user2.getId());
 
-        assertEquals(user1.getFriends(), new HashSet<>(),  "Список друзей не пуст");
-        assertEquals(user3.getFriends(), new HashSet<>(), "Список друзей не пуст");
+        assertEquals(userService.getFriends(user1.getId()), new ArrayList<>(), "Список друзей не пуст");
+        assertEquals(userService.getFriends(user3.getId()), new ArrayList<>(), "Список друзей не пуст");
     }
 
     @Test
