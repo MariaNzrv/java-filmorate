@@ -144,23 +144,23 @@ public class FilmDbStorage implements FilmStorage {
             String sqlQuery = "update films set " +
                     "name = ?, description = ?, releaseDate = ?, duration = ?, rating_id = ? " +
                     "where id = ?";
-            jdbcTemplate.update(sqlQuery
-                    , film.getName()
-                    , film.getDescription()
-                    , film.getReleaseDate()
-                    , film.getDuration()
-                    , film.getMpa().getId()
-                    , id);
+            jdbcTemplate.update(sqlQuery,
+                    film.getName(),
+                    film.getDescription(),
+                    film.getReleaseDate(),
+                    film.getDuration(),
+                    film.getMpa().getId(),
+                    id);
         } else {
             String sqlQuery = "update films set " +
                     "name = ?, description = ?, releaseDate = ?, duration = ? " +
                     "where id = ?";
-            jdbcTemplate.update(sqlQuery
-                    , film.getName()
-                    , film.getDescription()
-                    , film.getReleaseDate()
-                    , film.getDuration()
-                    , id);
+            jdbcTemplate.update(sqlQuery,
+                    film.getName(),
+                    film.getDescription(),
+                    film.getReleaseDate(),
+                    film.getDuration(),
+                    id);
         }
 
         // удаляем все связи жанр-фильм

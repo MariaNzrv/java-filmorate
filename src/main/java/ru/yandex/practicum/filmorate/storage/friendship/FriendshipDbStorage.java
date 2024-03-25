@@ -42,18 +42,12 @@ public class FriendshipDbStorage implements FriendshipStorage {
 
             // обновляем статус дружбы у существующей связи
             String sqlUpdate = "update friendship set status_code_id = ? where user_id = ? and friend_id = ?";
-            jdbcTemplate.update(sqlUpdate
-                    , getStatusCodeId("CONFIRMED")
-                    , friendId
-                    , userId);
+            jdbcTemplate.update(sqlUpdate, getStatusCodeId("CONFIRMED"), friendId, userId);
 
             log.info("Подтверждена дружба пользователей с id: {} {}", userId, friendId);
         } else {
             // иначе, вставляем новую связь с неподтвержденным статусом
-            jdbcTemplate.update(sqlQuery,
-                    userId,
-                    friendId,
-                    getStatusCodeId("UNCONFIRMED"));
+            jdbcTemplate.update(sqlQuery, userId, friendId, getStatusCodeId("UNCONFIRMED"));
 
             log.info("Пользователю с id = {} добавлен друг с id = {}", userId, friendId);
         }
