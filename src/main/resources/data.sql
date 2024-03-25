@@ -1,5 +1,5 @@
-DELETE
-FROM genre;
+DELETE FROM genre;
+ALTER TABLE genre ALTER COLUMN id RESTART WITH 1;
 ---- Заполняем таблицу с жанрами
 INSERT INTO genre (name)
 VALUES ('Комедия');
@@ -15,8 +15,8 @@ INSERT INTO genre (name)
 VALUES ('Боевик');
 COMMIT;
 
-DELETE
-FROM rating;
+DELETE FROM rating;
+ALTER TABLE rating ALTER COLUMN id RESTART WITH 1;
 ------- Заполняем таблицу с рейтингами
 INSERT INTO rating (name, description)
 VALUES ('G', 'Нет возрастных ограничений');
@@ -30,8 +30,8 @@ INSERT INTO rating (name, description)
 VALUES ('NC-17', 'Лицам до 18 лет просмотр запрещен');
 COMMIT;
 
-DELETE
-FROM friend_status;
+DELETE FROM friend_status;
+ALTER TABLE friend_status ALTER COLUMN id RESTART WITH 1;
 ----- Заполняем таблицу статуса дружбы
 INSERT INTO friend_status (status_code)
 VALUES ('CONFIRMED');
