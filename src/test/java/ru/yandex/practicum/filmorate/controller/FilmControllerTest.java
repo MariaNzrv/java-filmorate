@@ -172,7 +172,7 @@ class FilmControllerTest {
         Film film1 = filmService.createFilm(film);
 
         User user = new User("mail@ya.ru", "pika");
-        UserService userService = new UserService(userStorage);
+        UserService userService = new UserService(userStorage, null);
 
         user.setBirthday(LocalDate.of(1995, Month.SEPTEMBER, 24));
         user.setName("Пикачу");
@@ -202,7 +202,7 @@ class FilmControllerTest {
         Film film1 = filmService.createFilm(film);
 
         User user = new User("mail@ya.ru", "pika");
-        UserService userService = new UserService(userStorage);
+        UserService userService = new UserService(userStorage, null);
 
         user.setBirthday(LocalDate.of(1995, Month.SEPTEMBER, 24));
         user.setName("Пикачу");
@@ -230,7 +230,7 @@ class FilmControllerTest {
         Film film1 = filmService.createFilm(film);
 
         User user = new User("mail@ya.ru", "pika");
-        UserService userService = new UserService(userStorage);
+        UserService userService = new UserService(userStorage, null);
 
         user.setBirthday(LocalDate.of(1995, Month.SEPTEMBER, 24));
         user.setName("Пикачу");
@@ -258,7 +258,7 @@ class FilmControllerTest {
         Film film1 = filmService.createFilm(film);
 
         User user = new User("mail@ya.ru", "pika");
-        UserService userService = new UserService(userStorage);
+        UserService userService = new UserService(userStorage, null);
 
         user.setBirthday(LocalDate.of(1995, Month.SEPTEMBER, 24));
         user.setName("Пикачу");
@@ -295,7 +295,7 @@ class FilmControllerTest {
         Film film1 = filmService.createFilm(film);
 
         User user = new User("mail@ya.ru", "pika");
-        UserService userService = new UserService(userStorage);
+        UserService userService = new UserService(userStorage, null);
 
         user.setBirthday(LocalDate.of(1995, Month.SEPTEMBER, 24));
         user.setName("Пикачу");
@@ -339,7 +339,7 @@ class FilmControllerTest {
         Film film3 = filmService.createFilm(film2);
 
         User user = new User("mail@ya.ru", "pika");
-        UserService userService = new UserService(userStorage);
+        UserService userService = new UserService(userStorage, null);
 
         user.setBirthday(LocalDate.of(1995, Month.SEPTEMBER, 24));
         user.setName("Пикачу");
@@ -386,7 +386,7 @@ class FilmControllerTest {
         Film film3 = filmService.createFilm(film2);
 
         User user = new User("mail@ya.ru", "pika");
-        UserService userService = new UserService(userStorage);
+        UserService userService = new UserService(userStorage, null);
 
         user.setBirthday(LocalDate.of(1995, Month.SEPTEMBER, 24));
         user.setName("Пикачу");

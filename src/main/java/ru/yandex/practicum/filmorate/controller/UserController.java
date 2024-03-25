@@ -46,7 +46,7 @@ public class UserController {
     }
 
     /**
-     * получение списка друзей, общмих с другим пользователем
+     * получение списка друзей, общих с другим пользователем
      */
     @GetMapping("/{id}/friends/common/{otherId}")
     public List<User> getCommonFriends(@PathVariable Integer id, @PathVariable Integer otherId) {

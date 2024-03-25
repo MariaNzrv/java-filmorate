@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -26,7 +27,7 @@ public class FilmService {
     private final UserStorage userStorage;
 
     @Autowired
-    public FilmService(FilmStorage filmStorage, UserStorage userStorage) {
+    public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage, @Qualifier("userDbStorage") UserStorage userStorage) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
     }
@@ -38,6 +39,7 @@ public class FilmService {
             if (userStorage.isUserExist(userId)) {
                 Set<Integer> filmLikes = film.getLikes();
                 filmLikes.add(userId);
+                filmStorage.saveLike(userId, filmId);
             } else {
                 log.error("Пользователя с Id = {} не существует", userId);
                 throw new RuntimeException("Пользователя с Id = " + userId + " не существует");
@@ -54,6 +56,7 @@ public class FilmService {
             Film film = filmStorage.findById(filmId);
             if (userStorage.isUserExist(userId)) {
                 film.getLikes().remove(userId);
+                filmStorage.removeLike(userId, filmId);
             } else {
                 log.error("Пользователя с Id = {} не существует", userId);
                 throw new RuntimeException("Пользователя с Id = " + userId + " не существует");

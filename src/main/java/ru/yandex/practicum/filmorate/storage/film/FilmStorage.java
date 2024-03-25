@@ -18,4 +18,10 @@ public interface FilmStorage {
     Film findById(Integer filmId);
 
     Boolean isFilmExist(Integer filmId);
+
+    // добавление лайка
+    void saveLike(Integer userId, Integer filmId);
+
+    // удаление лайка
+    void removeLike(Integer userId, Integer filmId);
 }

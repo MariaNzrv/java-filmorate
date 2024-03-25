@@ -1,5 +1,6 @@
-package ru.yandex.practicum.filmorate.service;
+package ru.yandex.practicum.filmorate.storage.friendship;
 
+import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Friendship;
 
 import java.util.ArrayList;
@@ -7,10 +8,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class FriendshipService {
+@Component
+public class InMemoryFriendshipService implements FriendshipStorage {
     private final Set<Friendship> friendshipSet = new HashSet<>();
 
     // получения друзей по Id
+    @Override
     public List<Integer> getFriends(Integer userId) {
         List<Integer> friends = new ArrayList<>();
         for (Friendship friendship : friendshipSet) {
@@ -24,12 +27,14 @@ public class FriendshipService {
     }
 
     // добавление друга
+    @Override
     public void addFriendship(Integer userId, Integer friendId) {
         Friendship friendship = new Friendship(userId, friendId);
         friendshipSet.add(friendship);
     }
 
     // удаление друга
+    @Override
     public void removeFriendship(Integer userId, Integer friendId) {
         Friendship friendship = new Friendship(userId, friendId);
         if (friendshipSet.contains(friendship)) {

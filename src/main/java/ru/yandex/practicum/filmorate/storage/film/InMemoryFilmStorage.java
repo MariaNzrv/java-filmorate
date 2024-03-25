@@ -56,4 +56,12 @@ public class InMemoryFilmStorage implements FilmStorage {
         return result;
     }
 
+    @Override
+    public void saveLike(Integer userId, Integer filmId) {
+    }
+
+    @Override
+    public void removeLike(Integer userId, Integer filmId) {
+    }
+
 }
