@@ -14,10 +14,7 @@ import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
 import java.time.Month;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -161,13 +158,18 @@ public class FilmService {
 
         // проверяем жанры
         if (!film.getGenres().isEmpty()) {
+            Map<Integer, Genre> filteredGenres = new HashMap<>();
             for (Genre genre : film.getGenres()) {
-                // ищем жанр по id
-                if (genreStorage.findById(genre.getId()) == null) {
-                    log.error("Жанр '{}' не найден в системе", genre.getId());
-                    throw new RuntimeException("Жанр '" + genre.getId() + "' не найден в системе");
+                if (!filteredGenres.containsKey(genre.getId())) {
+                    // ищем жанр по id
+                    if (genreStorage.findById(genre.getId()) == null) {
+                        log.error("Жанр '{}' не найден в системе", genre.getId());
+                        throw new ValidationException("Жанр '" + genre.getId() + "' не найден в системе");
+                    }
+                    filteredGenres.put(genre.getId(), genre);
                 }
             }
+            film.setGenres(new ArrayList<>(filteredGenres.values()));
         }
 
         // проверяем пользователей, поставивших лайки

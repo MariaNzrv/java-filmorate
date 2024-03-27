@@ -72,7 +72,15 @@ public class UserService {
     public void removeFriend(Integer userId, Integer friendId) {
         if (userStorage.isUserExist(userId)) {
             if (userStorage.isUserExist(friendId)) {
-                friendshipStorage.removeFriendship(userId, friendId);
+                Friendship friendship = friendshipStorage.getFriendship(userId, friendId);
+                if (friendship != null) {
+                    if (friendship.getStatusCode() == FriendStatusCode.CONFIRMED) {
+                        friendshipStorage.removeFriendship(userId, friendId);
+                        friendshipStorage.addFriendship(friendId, userId, FriendStatusCode.UNCONFIRMED.name());
+                    } else if (friendship.getUserId().equals(userId)) {
+                        friendshipStorage.removeFriendship(userId, friendId);
+                    }
+                }
             } else {
                 log.error("Пользователя с Id = {} не существует", friendId);
                 throw new RuntimeException("Пользователя с Id = " + friendId + " не существует");
