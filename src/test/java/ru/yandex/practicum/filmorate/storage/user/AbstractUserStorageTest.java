@@ -9,7 +9,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-abstract public class AbstractUserStorageTest {
+abstract class AbstractUserStorageTest {
     protected UserStorage userStorage;
 
     @Test
