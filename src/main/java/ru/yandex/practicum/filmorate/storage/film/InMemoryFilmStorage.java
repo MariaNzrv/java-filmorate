@@ -3,10 +3,9 @@ package ru.yandex.practicum.filmorate.storage.film;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 @Slf4j
 @Component
@@ -58,10 +57,35 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public void saveLike(Integer userId, Integer filmId) {
+        Film film = films.get(filmId);
+        if (film != null) {
+            film.getLikes().add(userId);
+        }
     }
 
     @Override
     public void removeLike(Integer userId, Integer filmId) {
+        Film film = films.get(filmId);
+        if (film != null) {
+            film.getLikes().remove(userId);
+        }
     }
 
+    @Override
+    public List<Genre> getGenresByFilmId(Integer filmId) {
+        Film film = findById(filmId);
+        if (film == null) {
+            return Collections.emptyList();
+        }
+        return film.getGenres();
+    }
+
+    @Override
+    public Set<Integer> getLikesByFilmId(Integer filmId) {
+        Film film = findById(filmId);
+        if (film == null) {
+            return Collections.emptySet();
+        }
+        return film.getLikes();
+    }
 }

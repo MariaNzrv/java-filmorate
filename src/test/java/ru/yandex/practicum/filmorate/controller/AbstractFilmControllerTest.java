@@ -6,7 +6,6 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.service.UserService;
-import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
@@ -16,12 +15,13 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class FilmControllerTest {
+abstract class AbstractFilmControllerTest {
+    protected FilmService filmService;
+    protected UserService userService;
 
     @Test
     void filmValidateOk() {
         Film film = new Film();
-        FilmService filmService = new FilmService(new InMemoryFilmStorage(), new InMemoryUserStorage());
 
         film.setName("Гордость и предубеждение");
         film.setDescription("по роману Дж.Остин");
@@ -36,7 +36,6 @@ class FilmControllerTest {
     @Test
     void filmEmptyName() {
         Film film = new Film();
-        FilmService filmService = new FilmService(new InMemoryFilmStorage(), new InMemoryUserStorage());
 
         film.setName("");
         film.setDescription("по роману Дж.Остин");
@@ -51,7 +50,6 @@ class FilmControllerTest {
     @Test
     void filmBadLongDescriptionLength() {
         Film film = new Film();
-        FilmService filmService = new FilmService(new InMemoryFilmStorage(), new InMemoryUserStorage());
 
         film.setName("Гордость и предубеждение");
         film.setDescription("«Го́рдость и предубежде́ние» (англ. Pride and Prejudice) — шестисерийный драматический " +
@@ -68,7 +66,6 @@ class FilmControllerTest {
     @Test
     void filmBadReleaseDate() {
         Film film = new Film();
-        FilmService filmService = new FilmService(new InMemoryFilmStorage(), new InMemoryUserStorage());
 
         film.setName("Гордость и предубеждение");
         film.setDescription("по роману Дж.Остин");
@@ -83,7 +80,6 @@ class FilmControllerTest {
     @Test
     void filmFirstReleaseDateOk() {
         Film film = new Film();
-        FilmService filmService = new FilmService(new InMemoryFilmStorage(), new InMemoryUserStorage());
 
         film.setName("Гордость и предубеждение");
         film.setDescription("по роману Дж.Остин");
@@ -98,7 +94,6 @@ class FilmControllerTest {
     @Test
     void filmWithNegativeDuration() {
         Film film = new Film();
-        FilmService filmService = new FilmService(new InMemoryFilmStorage(), new InMemoryUserStorage());
 
         film.setName("Гордость и предубеждение");
         film.setDescription("по роману Дж.Остин");
@@ -113,7 +108,6 @@ class FilmControllerTest {
     @Test
     void filmWith0Duration() {
         Film film = new Film();
-        FilmService filmService = new FilmService(new InMemoryFilmStorage(), new InMemoryUserStorage());
 
         film.setName("Гордость и предубеждение");
         film.setDescription("по роману Дж.Остин");
@@ -128,7 +122,6 @@ class FilmControllerTest {
     @Test
     void updateFilmWithoutId() {
         Film film = new Film();
-        FilmService filmService = new FilmService(new InMemoryFilmStorage(), new InMemoryUserStorage());
 
         film.setName("Гордость и предубеждение");
         film.setDescription("по роману Дж.Остин, опубликованному в 1813 году");
@@ -143,7 +136,6 @@ class FilmControllerTest {
     @Test
     void updateFilmWithUnknownId() {
         Film film = new Film();
-        FilmService filmService = new FilmService(new InMemoryFilmStorage(), new InMemoryUserStorage());
 
         film.setName("Гордость и предубеждение");
         film.setDescription("по роману Дж.Остин, опубликованному в 1813 году");
@@ -158,11 +150,7 @@ class FilmControllerTest {
 
     @Test
     void addLikeOk() {
-        UserStorage userStorage = new InMemoryUserStorage();
-
         Film film = new Film();
-        FilmService filmService = new FilmService(new InMemoryFilmStorage(), userStorage);
-
 
         film.setName("Гордость и предубеждение");
         film.setDescription("по роману Дж.Остин");
@@ -172,7 +160,6 @@ class FilmControllerTest {
         Film film1 = filmService.createFilm(film);
 
         User user = new User("mail@ya.ru", "pika");
-        UserService userService = new UserService(userStorage, null);
 
         user.setBirthday(LocalDate.of(1995, Month.SEPTEMBER, 24));
         user.setName("Пикачу");
@@ -180,6 +167,7 @@ class FilmControllerTest {
         User user1 = userService.createUser(user);
 
         filmService.addLike(film1.getId(), user1.getId());
+        film1 = filmService.findFilmById(film1.getId());
 
         assertNotNull(film1.getLikes(), "Список лайков пуст");
         assertEquals(film1.getLikes().iterator().next(), user1.getId(), "Список лайков содержит неверное значение");
@@ -188,11 +176,7 @@ class FilmControllerTest {
 
     @Test
     void addLikeFromUnknownUser() {
-        UserStorage userStorage = new InMemoryUserStorage();
-
         Film film = new Film();
-        FilmService filmService = new FilmService(new InMemoryFilmStorage(), userStorage);
-
 
         film.setName("Гордость и предубеждение");
         film.setDescription("по роману Дж.Остин");
@@ -202,7 +186,6 @@ class FilmControllerTest {
         Film film1 = filmService.createFilm(film);
 
         User user = new User("mail@ya.ru", "pika");
-        UserService userService = new UserService(userStorage, null);
 
         user.setBirthday(LocalDate.of(1995, Month.SEPTEMBER, 24));
         user.setName("Пикачу");
@@ -216,11 +199,7 @@ class FilmControllerTest {
 
     @Test
     void addLikeToUnknownFilm() {
-        UserStorage userStorage = new InMemoryUserStorage();
-
         Film film = new Film();
-        FilmService filmService = new FilmService(new InMemoryFilmStorage(), userStorage);
-
 
         film.setName("Гордость и предубеждение");
         film.setDescription("по роману Дж.Остин");
@@ -230,7 +209,6 @@ class FilmControllerTest {
         Film film1 = filmService.createFilm(film);
 
         User user = new User("mail@ya.ru", "pika");
-        UserService userService = new UserService(userStorage, null);
 
         user.setBirthday(LocalDate.of(1995, Month.SEPTEMBER, 24));
         user.setName("Пикачу");
@@ -244,11 +222,7 @@ class FilmControllerTest {
 
     @Test
     void removeLikeOk() {
-        UserStorage userStorage = new InMemoryUserStorage();
-
         Film film = new Film();
-        FilmService filmService = new FilmService(new InMemoryFilmStorage(), userStorage);
-
 
         film.setName("Гордость и предубеждение");
         film.setDescription("по роману Дж.Остин");
@@ -258,7 +232,6 @@ class FilmControllerTest {
         Film film1 = filmService.createFilm(film);
 
         User user = new User("mail@ya.ru", "pika");
-        UserService userService = new UserService(userStorage, null);
 
         user.setBirthday(LocalDate.of(1995, Month.SEPTEMBER, 24));
         user.setName("Пикачу");
@@ -273,6 +246,7 @@ class FilmControllerTest {
         filmService.addLike(film1.getId(), user1.getId());
         filmService.addLike(film1.getId(), user3.getId());
         filmService.removeLike(film1.getId(), user1.getId());
+        film1 = filmService.findFilmById(film1.getId());
 
         assertNotNull(film1.getLikes(), "Список лайков пуст");
         assertEquals(film1.getLikes().iterator().next(), user3.getId(), "Список лайков содержит неверное значение");
@@ -281,11 +255,7 @@ class FilmControllerTest {
 
     @Test
     void removeLikeFromUnknownFilm() {
-        UserStorage userStorage = new InMemoryUserStorage();
-
         Film film = new Film();
-        FilmService filmService = new FilmService(new InMemoryFilmStorage(), userStorage);
-
 
         film.setName("Гордость и предубеждение");
         film.setDescription("по роману Дж.Остин");
@@ -295,7 +265,6 @@ class FilmControllerTest {
         Film film1 = filmService.createFilm(film);
 
         User user = new User("mail@ya.ru", "pika");
-        UserService userService = new UserService(userStorage, null);
 
         user.setBirthday(LocalDate.of(1995, Month.SEPTEMBER, 24));
         user.setName("Пикачу");
@@ -317,11 +286,7 @@ class FilmControllerTest {
 
     @Test
     void getMostLikeFilmsOk() {
-        UserStorage userStorage = new InMemoryUserStorage();
-
         Film film = new Film();
-        FilmService filmService = new FilmService(new InMemoryFilmStorage(), userStorage);
-
 
         film.setName("Гордость и предубеждение");
         film.setDescription("по роману Дж.Остин");
@@ -339,7 +304,6 @@ class FilmControllerTest {
         Film film3 = filmService.createFilm(film2);
 
         User user = new User("mail@ya.ru", "pika");
-        UserService userService = new UserService(userStorage, null);
 
         user.setBirthday(LocalDate.of(1995, Month.SEPTEMBER, 24));
         user.setName("Пикачу");
@@ -356,6 +320,7 @@ class FilmControllerTest {
         filmService.addLike(film3.getId(), user3.getId());
 
         List<Film> popularFilms = filmService.getMostLikeFilms(1);
+        film1 = filmService.findFilmById(film1.getId());
 
         assertNotNull(popularFilms, "Список фильмов пуст");
         assertEquals(popularFilms.get(0), film1, "Список фильмов содержит неверное значение");
@@ -364,11 +329,7 @@ class FilmControllerTest {
 
     @Test
     void getMostLikeFilmsWithEmptyCount() {
-        UserStorage userStorage = new InMemoryUserStorage();
-
         Film film = new Film();
-        FilmService filmService = new FilmService(new InMemoryFilmStorage(), userStorage);
-
 
         film.setName("Гордость и предубеждение");
         film.setDescription("по роману Дж.Остин");
@@ -386,7 +347,6 @@ class FilmControllerTest {
         Film film3 = filmService.createFilm(film2);
 
         User user = new User("mail@ya.ru", "pika");
-        UserService userService = new UserService(userStorage, null);
 
         user.setBirthday(LocalDate.of(1995, Month.SEPTEMBER, 24));
         user.setName("Пикачу");
@@ -410,11 +370,7 @@ class FilmControllerTest {
 
     @Test
     void findAllFilmsOk() {
-        UserStorage userStorage = new InMemoryUserStorage();
-
         Film film = new Film();
-        FilmService filmService = new FilmService(new InMemoryFilmStorage(), userStorage);
-
 
         film.setName("Гордость и предубеждение");
         film.setDescription("по роману Дж.Остин");
@@ -442,8 +398,6 @@ class FilmControllerTest {
         UserStorage userStorage = new InMemoryUserStorage();
 
         Film film = new Film();
-        FilmService filmService = new FilmService(new InMemoryFilmStorage(), userStorage);
-
 
         film.setName("Гордость и предубеждение");
         film.setDescription("по роману Дж.Остин");
@@ -467,11 +421,7 @@ class FilmControllerTest {
 
     @Test
     void findFilmByIdWithUnknownId() {
-        UserStorage userStorage = new InMemoryUserStorage();
-
         Film film = new Film();
-        FilmService filmService = new FilmService(new InMemoryFilmStorage(), userStorage);
-
 
         film.setName("Гордость и предубеждение");
         film.setDescription("по роману Дж.Остин");

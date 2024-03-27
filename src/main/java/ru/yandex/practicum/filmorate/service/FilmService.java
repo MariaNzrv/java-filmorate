@@ -6,7 +6,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
+import ru.yandex.practicum.filmorate.storage.rating.RatingStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
@@ -25,17 +28,24 @@ public class FilmService {
     private static final Integer MAX_COUNT = 10;  // кол-во выдаваемых фильмов с максимальным числом лайков
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
+    private final RatingStorage ratingStorage;
+    private final GenreStorage genreStorage;
 
     @Autowired
-    public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage, @Qualifier("userDbStorage") UserStorage userStorage) {
+    public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage,
+                       @Qualifier("userDbStorage") UserStorage userStorage,
+                       @Qualifier("ratingDbStorage") RatingStorage ratingStorage,
+                       @Qualifier("genreDbStorage") GenreStorage genreStorage) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
+        this.ratingStorage = ratingStorage;
+        this.genreStorage = genreStorage;
     }
 
     // добавление лайка
     public void addLike(Integer filmId, Integer userId) {
         if (filmStorage.isFilmExist(filmId)) {
-            Film film = filmStorage.findById(filmId);
+            Film film = findFilmById(filmId);
             if (userStorage.isUserExist(userId)) {
                 Set<Integer> filmLikes = film.getLikes();
                 filmLikes.add(userId);
@@ -53,7 +63,7 @@ public class FilmService {
     // удаление лайка
     public void removeLike(Integer filmId, Integer userId) {
         if (filmStorage.isFilmExist(filmId)) {
-            Film film = filmStorage.findById(filmId);
+            Film film = findFilmById(filmId);
             if (userStorage.isUserExist(userId)) {
                 film.getLikes().remove(userId);
                 filmStorage.removeLike(userId, filmId);
@@ -92,7 +102,10 @@ public class FilmService {
             log.error("Фильм с Id = {} не существует", filmId);
             throw new RuntimeException("Фильма с Id = " + filmId + " не существует");
         }
-        return filmStorage.findById(filmId);
+        Film film = filmStorage.findById(filmId);
+        film.setLikes(filmStorage.getLikesByFilmId(filmId));
+        film.setGenres(filmStorage.getGenresByFilmId(filmId));
+        return film;
     }
 
     public Film createFilm(Film film) {
@@ -136,6 +149,36 @@ public class FilmService {
         if (duration != null && duration <= 0) {
             log.warn("Продолжительность фильма {} минут, а должна быть положительной", film.getDuration());
             throw new ValidationException("продолжительность фильма должна быть положительной");
+        }
+
+        // проверяем рейтинг
+        if (film.getMpa() != null) {
+            if (ratingStorage.findById(film.getMpa().getId()) == null) {
+                log.error("Рейтинг с идентификатором {} не найден.", film.getMpa().getId());
+                throw new ValidationException("Рейтинг с идентификатором " + film.getMpa().getId() + " не найден.");
+            }
+        }
+
+        // проверяем жанры
+        if (!film.getGenres().isEmpty()) {
+            for (Genre genre : film.getGenres()) {
+                // ищем жанр по id
+                if (genreStorage.findById(genre.getId()) == null) {
+                    log.error("Жанр '{}' не найден в системе", genre.getId());
+                    throw new RuntimeException("Жанр '" + genre.getId() + "' не найден в системе");
+                }
+            }
+        }
+
+        // проверяем пользователей, поставивших лайки
+        if (!film.getLikes().isEmpty()) {
+            for (Integer userId : film.getLikes()) {
+                // ищем пользователя по Id
+                if (!userStorage.isUserExist(userId)) {
+                    log.error("Пользователь с идентификатором {} не найден.", userId);
+                    throw new RuntimeException("Пользователь с идентификатором " + userId + " не найден.");
+                }
+            }
         }
 
     }

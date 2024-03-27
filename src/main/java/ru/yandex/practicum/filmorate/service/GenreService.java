@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -10,24 +11,22 @@ import java.util.List;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class GenreService {
-    private final GenreStorage genreStorage;
-
     @Autowired
-    public GenreService(GenreStorage genreStorage) {
-        this.genreStorage = genreStorage;
-    }
+    private final GenreStorage genreStorage;
 
     public List<Genre> findAllGenres() {
         return genreStorage.findAll();
     }
 
     public Genre findGenreById(Integer genreId) {
-        if (!genreStorage.isGenreExist(genreId)) {
+        Genre genre = genreStorage.findById(genreId);
+        if (genre == null) {
             log.error("Жанр с Id = {} не существует", genreId);
             throw new RuntimeException("Жанр с Id = " + genreId + " не существует");
         }
 
-        return genreStorage.findById(genreId);
+        return genre;
     }
 }

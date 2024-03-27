@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -10,23 +11,21 @@ import java.util.List;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class RatingService {
-    private final RatingStorage ratingStorage;
-
     @Autowired
-    public RatingService(RatingStorage ratingStorage) {
-        this.ratingStorage = ratingStorage;
-    }
+    private final RatingStorage ratingStorage;
 
     public List<Rating> findAllRatings() {
         return ratingStorage.findAll();
     }
 
     public Rating findRatingById(Integer ratingId) {
-        if (!ratingStorage.isRatingExist(ratingId)) {
+        Rating rating = ratingStorage.findById(ratingId);
+        if (rating == null) {
             log.error("Рейтинг с Id = {} не существует", ratingId);
             throw new RuntimeException("Рейтинг с Id = " + ratingId + " не существует");
         }
-        return ratingStorage.findById(ratingId);
+        return rating;
     }
 }

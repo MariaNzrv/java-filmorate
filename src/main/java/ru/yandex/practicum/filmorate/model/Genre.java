@@ -12,5 +12,5 @@ public class Genre {
     // жанр
     private Integer id; // идентификатор
     @NonNull
-    private GenreName name; //название
+    private String name; //название
 }

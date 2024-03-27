@@ -12,9 +12,4 @@ public interface GenreStorage {
     // получение жанра по id
     Genre findById(Integer genreId);
 
-    // получение списка жанров фильма
-    List<Genre> getGenresByFilmId(Integer filmId);
-
-    Boolean isGenreExist(Integer genreId);
-
 }

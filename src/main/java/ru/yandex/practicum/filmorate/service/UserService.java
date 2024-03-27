@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.FriendStatusCode;
+import ru.yandex.practicum.filmorate.model.Friendship;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.friendship.FriendshipStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
@@ -16,7 +18,6 @@ import java.util.List;
 @Slf4j
 @Service
 public class UserService {
-
     private final UserStorage userStorage;
     private final FriendshipStorage friendshipStorage;
 
@@ -50,7 +51,12 @@ public class UserService {
     public void addFriend(Integer userId, Integer friendId) {
         if (userStorage.isUserExist(userId)) {
             if (userStorage.isUserExist(friendId)) {
-                friendshipStorage.addFriendship(userId, friendId);
+                Friendship friendship = friendshipStorage.getFriendship(userId, friendId);
+                if (friendship == null) {
+                    friendshipStorage.addFriendship(userId, friendId, String.valueOf(FriendStatusCode.UNCONFIRMED));
+                } else if (friendship.getFriendId().equals(userId)) {
+                    friendshipStorage.updateFriendship(friendship.getUserId(), friendship.getFriendId(), String.valueOf(FriendStatusCode.CONFIRMED));
+                }
             } else {
                 log.error("Невозможно добавить в друзья пользователя с Id = {}, его не существует", friendId);
                 throw new RuntimeException("Невозможно добавить в друзья пользователя с Id = " + friendId +

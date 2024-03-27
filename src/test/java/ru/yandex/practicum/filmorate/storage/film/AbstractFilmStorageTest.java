@@ -1,16 +1,9 @@
-package ru.yandex.practicum.filmorate.storage;
+package ru.yandex.practicum.filmorate.storage.film;
 
-import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.annotation.DirtiesContext;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
-import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -20,14 +13,11 @@ import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD;
 
-@JdbcTest // указываем, о необходимости подготовить бины для работы с БД
-@RequiredArgsConstructor(onConstructor_ = @Autowired)
-@DirtiesContext(classMode = BEFORE_EACH_TEST_METHOD)
-@AutoConfigureTestDatabase
-public class FilmDbStorageTest {
-    private final JdbcTemplate jdbcTemplate;
+abstract public class AbstractFilmStorageTest {
+
+    protected FilmStorage filmStorage;
+    protected UserStorage userStorage;
 
     @Test
     public void testFindFilmById() {
@@ -39,7 +29,6 @@ public class FilmDbStorageTest {
         film.setDuration(300L);
         film.setReleaseDate(LocalDate.of(1995, Month.SEPTEMBER, 24));
 
-        FilmDbStorage filmStorage = new FilmDbStorage(jdbcTemplate);
         filmStorage.create(film);
 
         // вызываем тестируемый метод
@@ -62,7 +51,6 @@ public class FilmDbStorageTest {
         film.setDuration(300L);
         film.setReleaseDate(LocalDate.of(1995, Month.SEPTEMBER, 24));
 
-        FilmDbStorage filmStorage = new FilmDbStorage(jdbcTemplate);
         filmStorage.create(film);
 
         // вызываем тестируемый метод
@@ -83,7 +71,6 @@ public class FilmDbStorageTest {
         film.setDuration(300L);
         film.setReleaseDate(LocalDate.of(1995, Month.SEPTEMBER, 24));
 
-        FilmDbStorage filmStorage = new FilmDbStorage(jdbcTemplate);
         filmStorage.create(film);
 
         // вызываем тестируемый метод
@@ -105,7 +92,6 @@ public class FilmDbStorageTest {
         film.setDuration(300L);
         film.setReleaseDate(LocalDate.of(1995, Month.SEPTEMBER, 24));
 
-        FilmDbStorage filmStorage = new FilmDbStorage(jdbcTemplate);
         filmStorage.create(film);
 
         // вызываем тестируемый метод
@@ -134,7 +120,6 @@ public class FilmDbStorageTest {
         film2.setDuration(143L);
         film2.setReleaseDate(LocalDate.of(2003, Month.AUGUST, 22));
 
-        FilmDbStorage filmStorage = new FilmDbStorage(jdbcTemplate);
         filmStorage.create(film);
         filmStorage.create(film2);
 
@@ -169,7 +154,6 @@ public class FilmDbStorageTest {
         film2.setDuration(143L);
         film2.setReleaseDate(LocalDate.of(2003, Month.AUGUST, 22));
 
-        FilmDbStorage filmStorage = new FilmDbStorage(jdbcTemplate);
         filmStorage.create(film);
 
         // вызываем тестируемый метод
@@ -192,7 +176,6 @@ public class FilmDbStorageTest {
         film.setDuration(300L);
         film.setReleaseDate(LocalDate.of(1995, Month.SEPTEMBER, 24));
 
-        FilmDbStorage filmStorage = new FilmDbStorage(jdbcTemplate);
 
         // вызываем тестируемый метод
         Film savedFilm = filmStorage.create(film);
@@ -214,26 +197,24 @@ public class FilmDbStorageTest {
         film.setDuration(300L);
         film.setReleaseDate(LocalDate.of(1995, Month.SEPTEMBER, 24));
 
-        FilmDbStorage filmStorage = new FilmDbStorage(jdbcTemplate);
 
         filmStorage.create(film);
 
         User newUser = new User(1, "user@email.ru", "vanya123", "Ivan Petrov", LocalDate.of(1990, 1, 1));
-        UserDbStorage userStorage = new UserDbStorage(jdbcTemplate);
         userStorage.create(newUser);
 
         filmStorage.saveLike(newUser.getId(), film.getId());
 
-        Set<Integer> likes = filmStorage.findById(1).getLikes();
+        Set<Integer> likes = filmStorage.getLikesByFilmId(film.getId());
 
-        Set<Integer> result = new HashSet<>();
-        result.add(1);
+        Set<Integer> expected = new HashSet<>();
+        expected.add(1);
 
         // проверяем утверждения
         assertThat(likes)
                 .isNotNull() // проверяем, что объект не равен null
                 .usingRecursiveComparison() // проверяем, что значения полей нового
-                .isEqualTo(result);        // и сохраненного пользователя - совпадают
+                .isEqualTo(expected);        // и сохраненного пользователя - совпадают
     }
 
     @Test
@@ -246,13 +227,10 @@ public class FilmDbStorageTest {
         film.setDuration(300L);
         film.setReleaseDate(LocalDate.of(1995, Month.SEPTEMBER, 24));
 
-        FilmDbStorage filmStorage = new FilmDbStorage(jdbcTemplate);
-
         filmStorage.create(film);
 
         User newUser = new User(1, "user@email.ru", "vanya123", "Ivan Petrov", LocalDate.of(1990, 1, 1));
         User newUser2 = new User(2, "user2@email.ru", "ira123", "Ira Borisova", LocalDate.of(1997, 7, 15));
-        UserDbStorage userStorage = new UserDbStorage(jdbcTemplate);
         userStorage.create(newUser);
         userStorage.create(newUser2);
 
@@ -260,15 +238,15 @@ public class FilmDbStorageTest {
         filmStorage.saveLike(newUser2.getId(), film.getId());
         filmStorage.removeLike(newUser.getId(), film.getId());
 
-        Set<Integer> likes = filmStorage.findById(1).getLikes();
+        Set<Integer> likes = filmStorage.getLikesByFilmId(film.getId());
 
-        Set<Integer> result = new HashSet<>();
-        result.add(2);
+        Set<Integer> expected = new HashSet<>();
+        expected.add(newUser2.getId());
 
         // проверяем утверждения
         assertThat(likes)
                 .isNotNull() // проверяем, что объект не равен null
                 .usingRecursiveComparison() // проверяем, что значения полей нового
-                .isEqualTo(result);        // и сохраненного пользователя - совпадают
+                .isEqualTo(expected);        // и сохраненного пользователя - совпадают
     }
 }

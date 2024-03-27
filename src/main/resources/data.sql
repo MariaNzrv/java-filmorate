@@ -29,12 +29,3 @@ VALUES ('R', 'Лицам до 17 лет обязательно присутст�
 INSERT INTO rating (name, description)
 VALUES ('NC-17', 'Лицам до 18 лет просмотр запрещен');
 COMMIT;
-
-DELETE FROM friend_status;
-ALTER TABLE friend_status ALTER COLUMN id RESTART WITH 1;
------ Заполняем таблицу статуса дружбы
-INSERT INTO friend_status (status_code)
-VALUES ('CONFIRMED');
-INSERT INTO friend_status (status_code)
-VALUES ('UNCONFIRMED');
-COMMIT;

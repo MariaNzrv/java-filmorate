@@ -1,9 +1,9 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -20,15 +20,11 @@ import java.util.Objects;
 
 @Component
 @Qualifier("userDbStorage")
+@RequiredArgsConstructor
 public class UserDbStorage implements UserStorage {
 
-    private final Logger log = LoggerFactory.getLogger(UserDbStorage.class);
-    private final JdbcTemplate jdbcTemplate;
-
     @Autowired
-    public UserDbStorage(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
+    private final JdbcTemplate jdbcTemplate;
 
     @Override
     public User create(User user) {
@@ -45,7 +41,6 @@ public class UserDbStorage implements UserStorage {
             return stmt;
         }, keyHolder);
         user.setId(Objects.requireNonNull(keyHolder.getKey()).intValue());
-        log.info("Создан пользователь с Id: '{}'", user.getId());
 
         return user;
     }
@@ -59,7 +54,6 @@ public class UserDbStorage implements UserStorage {
                 "where id = ?";
         jdbcTemplate.update(sqlQuery, user.getName(), user.getEmail(), user.getLogin(), user.getBirthday(), id);
 
-        log.info("Обновлен пользователь с Id: '{}'", id);
         return user;
     }
 
@@ -81,19 +75,10 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User findById(Integer userId) {
-        SqlRowSet userRows = jdbcTemplate.queryForRowSet("select * from users where id = ?", userId);
-        if (userRows.next()) {
-            User user = new User(
-                    userRows.getInt("id"),
-                    userRows.getString("email"),
-                    userRows.getString("login"),
-                    userRows.getString("name"),
-                    userRows.getDate("birthday").toLocalDate());
-            log.info("Найден пользователь: {} {}", user.getId(), user.getLogin());
-
-            return user;
-        } else {
-            log.info("Пользователь с идентификатором {} не найден.", userId);
+        String sql = "select * from users where id = ?";
+        try {
+            return jdbcTemplate.queryForObject(sql, (rs, rowNum) -> makeUser(rs), userId);
+        } catch (EmptyResultDataAccessException e) {
             return null;
         }
     }

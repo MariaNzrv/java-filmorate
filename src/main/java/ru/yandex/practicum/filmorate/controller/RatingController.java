@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,13 +16,10 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/mpa")
+@RequiredArgsConstructor
 public class RatingController {
-    private final RatingService ratingService;
-
     @Autowired
-    public RatingController(RatingService ratingService) {
-        this.ratingService = ratingService;
-    }
+    private final RatingService ratingService;
 
     /**
      * получение списка всех возрастных рейтингов.

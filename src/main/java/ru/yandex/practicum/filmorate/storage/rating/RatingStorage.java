@@ -10,6 +10,4 @@ public interface RatingStorage {
 
     // получение рейтинга по id
     Rating findById(Integer ratingId);
-
-    Boolean isRatingExist(Integer ratingId);
 }
