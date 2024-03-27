@@ -2,9 +2,13 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.FriendStatusCode;
+import ru.yandex.practicum.filmorate.model.Friendship;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.friendship.FriendshipStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
@@ -14,13 +18,13 @@ import java.util.List;
 @Slf4j
 @Service
 public class UserService {
-
     private final UserStorage userStorage;
-    private final FriendshipService friendshipService = new FriendshipService();
+    private final FriendshipStorage friendshipStorage;
 
     @Autowired
-    public UserService(UserStorage userStorage) {
+    public UserService(@Qualifier("userDbStorage") UserStorage userStorage, @Qualifier("friendshipDbStorage") FriendshipStorage friendshipStorage) {
         this.userStorage = userStorage;
+        this.friendshipStorage = friendshipStorage;
     }
 
     private static void validate(User user) {
@@ -47,7 +51,12 @@ public class UserService {
     public void addFriend(Integer userId, Integer friendId) {
         if (userStorage.isUserExist(userId)) {
             if (userStorage.isUserExist(friendId)) {
-                friendshipService.addFriendship(userId, friendId);
+                Friendship friendship = friendshipStorage.getFriendship(userId, friendId);
+                if (friendship == null) {
+                    friendshipStorage.addFriendship(userId, friendId, String.valueOf(FriendStatusCode.UNCONFIRMED));
+                } else if (friendship.getFriendId().equals(userId)) {
+                    friendshipStorage.updateFriendship(friendship.getUserId(), friendship.getFriendId(), String.valueOf(FriendStatusCode.CONFIRMED));
+                }
             } else {
                 log.error("Невозможно добавить в друзья пользователя с Id = {}, его не существует", friendId);
                 throw new RuntimeException("Невозможно добавить в друзья пользователя с Id = " + friendId +
@@ -63,7 +72,15 @@ public class UserService {
     public void removeFriend(Integer userId, Integer friendId) {
         if (userStorage.isUserExist(userId)) {
             if (userStorage.isUserExist(friendId)) {
-                friendshipService.removeFriendship(userId, friendId);
+                Friendship friendship = friendshipStorage.getFriendship(userId, friendId);
+                if (friendship != null) {
+                    if (friendship.getStatusCode() == FriendStatusCode.CONFIRMED) {
+                        friendshipStorage.removeFriendship(userId, friendId);
+                        friendshipStorage.addFriendship(friendId, userId, FriendStatusCode.UNCONFIRMED.name());
+                    } else if (friendship.getUserId().equals(userId)) {
+                        friendshipStorage.removeFriendship(userId, friendId);
+                    }
+                }
             } else {
                 log.error("Пользователя с Id = {} не существует", friendId);
                 throw new RuntimeException("Пользователя с Id = " + friendId + " не существует");
@@ -80,9 +97,8 @@ public class UserService {
             log.error("Пользователя с Id = {} не существует", userId);
             throw new RuntimeException("Пользователя с Id = " + userId + " не существует");
         }
-        User user = userStorage.findById(userId);
         ArrayList<User> userFriends = new ArrayList<>();
-        for (Integer friendId : friendshipService.getFriends(userId)) {
+        for (Integer friendId : friendshipStorage.getFriends(userId)) {
             userFriends.add(userStorage.findById(friendId));
         }
         return userFriends;
@@ -98,8 +114,8 @@ public class UserService {
             log.error("Пользователя с Id = {} не существует", otherUserId);
             throw new RuntimeException("Пользователя с Id = " + otherUserId + " не существует");
         }
-        List<Integer> userFriendsIds = friendshipService.getFriends(userId);
-        List<Integer> otherUserFriendsIds = friendshipService.getFriends(otherUserId);
+        List<Integer> userFriendsIds = friendshipStorage.getFriends(userId);
+        List<Integer> otherUserFriendsIds = friendshipStorage.getFriends(otherUserId);
         ArrayList<User> userFriends = new ArrayList<>();
         if (userFriendsIds != null && otherUserFriendsIds != null) {
             for (Integer id : userFriendsIds) {

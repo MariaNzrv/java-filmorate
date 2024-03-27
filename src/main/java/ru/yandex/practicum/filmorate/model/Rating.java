@@ -1,12 +1,17 @@
 package ru.yandex.practicum.filmorate.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Rating {
     // рейтинг
+    private Integer id; // идентификатор
     @NonNull
-    private RatingCode name; // название рейтинга
+    private String name; // название рейтинга
     private String description; // описание рейтинга
 }

@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.Data;
-import lombok.NonNull;
+import lombok.*;
 
 import java.time.LocalDate;
 
@@ -10,6 +9,9 @@ import java.time.LocalDate;
  */
 
 @Data
+@RequiredArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
 public class User {
     private Integer id; // целочисленный идентификатор
     @NonNull

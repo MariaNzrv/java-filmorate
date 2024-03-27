@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
-import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -13,11 +12,12 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class UserControllerTest {
+abstract class AbstractUserControllerTest {
+    protected UserService userService;
+
     @Test
     void userValidateOk() {
         User user = new User("mail@ya.ru", "pika");
-        UserService userService = new UserService(new InMemoryUserStorage());
 
         user.setBirthday(LocalDate.of(1995, Month.SEPTEMBER, 24));
         user.setName("Пикачу");
@@ -30,7 +30,6 @@ class UserControllerTest {
     @Test
     void userEmptyLogin() {
         User user = new User("mail@ya.ru", "");
-        UserService userService = new UserService(new InMemoryUserStorage());
 
         user.setBirthday(LocalDate.of(1995, Month.SEPTEMBER, 24));
         user.setName("Пикачу");
@@ -44,7 +43,6 @@ class UserControllerTest {
     @Test
     void userEmptyEmail() {
         User user = new User("", "pika");
-        UserService userService = new UserService(new InMemoryUserStorage());
 
         user.setBirthday(LocalDate.of(1995, Month.SEPTEMBER, 24));
         user.setName("Пикачу");
@@ -58,7 +56,6 @@ class UserControllerTest {
     @Test
     void userEmailWithoutDog() {
         User user = new User("mail", "pika");
-        UserService userService = new UserService(new InMemoryUserStorage());
 
         user.setBirthday(LocalDate.of(1995, Month.SEPTEMBER, 24));
         user.setName("Пикачу");
@@ -72,7 +69,6 @@ class UserControllerTest {
     @Test
     void userBadBirthday() {
         User user = new User("mail@ya.ru", "pika");
-        UserService userService = new UserService(new InMemoryUserStorage());
 
         user.setBirthday(LocalDate.of(2995, Month.SEPTEMBER, 24));
         user.setName("Пикачу");
@@ -86,7 +82,6 @@ class UserControllerTest {
     @Test
     void userEmptyName() {
         User user = new User("mail@ya.ru", "pika");
-        UserService userService = new UserService(new InMemoryUserStorage());
 
         user.setBirthday(LocalDate.of(1995, Month.SEPTEMBER, 24));
 
@@ -99,7 +94,6 @@ class UserControllerTest {
     @Test
     void updateUserWithoutId() {
         User user = new User("mail@ya.ru", "pika");
-        UserService userService = new UserService(new InMemoryUserStorage());
 
         user.setBirthday(LocalDate.of(1995, Month.SEPTEMBER, 24));
         user.setName("Пикачу");
@@ -116,7 +110,6 @@ class UserControllerTest {
     @Test
     void updateUserWithUnknownId() {
         User user = new User("mail@ya.ru", "pika");
-        UserService userService = new UserService(new InMemoryUserStorage());
 
         user.setBirthday(LocalDate.of(1995, Month.SEPTEMBER, 24));
         user.setName("Пикачу");
@@ -134,7 +127,6 @@ class UserControllerTest {
     @Test
     void updateUserOk() {
         User user = new User("mail@ya.ru", "pika");
-        UserService userService = new UserService(new InMemoryUserStorage());
 
         user.setBirthday(LocalDate.of(1995, Month.SEPTEMBER, 24));
         user.setName("Пикачу");
@@ -151,30 +143,27 @@ class UserControllerTest {
 
     @Test
     void addFriendOk() {
-        User user = new User("mail@ya.ru", "pika");
-        UserService userService = new UserService(new InMemoryUserStorage());
+        User user1 = new User("mail@ya.ru", "pika");
 
-        user.setBirthday(LocalDate.of(1995, Month.SEPTEMBER, 24));
-        user.setName("Пикачу");
+        user1.setBirthday(LocalDate.of(1995, Month.SEPTEMBER, 24));
+        user1.setName("Пикачу");
+        user1 = userService.createUser(user1);
 
-        User user1 = userService.createUser(user);
         User user2 = new User("mail2@ya.ru", "pika2");
         user2.setBirthday(LocalDate.of(1998, Month.SEPTEMBER, 14));
         user2.setName("Пикачу2");
-        User user3 = userService.createUser(user2);
+        user2 = userService.createUser(user2);
 
         userService.addFriend(user1.getId(), user2.getId());
 
-        assertNotNull(userService.getFriends(user1.getId()), "Список друзей пуст");
-        assertNotNull(userService.getFriends(user3.getId()), "Список друзей пуст");
+        assertEquals(userService.getFriends(user1.getId()).size(), 1, "Список друзей пуст");
+        assertEquals(userService.getFriends(user2.getId()).size(), 0, "Список друзей должен быть пуст");
         assertEquals(userService.getFriends(user1.getId()).get(0).getId(), 2, "Неверный id друга");
-        assertEquals(userService.getFriends(user3.getId()).get(0).getId(), 1, "Неверный id друга");
     }
 
     @Test
     void addUnknownFriend() {
         User user = new User("mail@ya.ru", "pika");
-        UserService userService = new UserService(new InMemoryUserStorage());
 
         user.setBirthday(LocalDate.of(1995, Month.SEPTEMBER, 24));
         user.setName("Пикачу");
@@ -189,7 +178,6 @@ class UserControllerTest {
     @Test
     void addFriendToUnknownUser() {
         User user = new User("mail@ya.ru", "pika");
-        UserService userService = new UserService(new InMemoryUserStorage());
 
         user.setBirthday(LocalDate.of(1995, Month.SEPTEMBER, 24));
         user.setName("Пикачу");
@@ -204,7 +192,6 @@ class UserControllerTest {
     @Test
     void removeFriendOk() {
         User user = new User("mail@ya.ru", "pika");
-        UserService userService = new UserService(new InMemoryUserStorage());
 
         user.setBirthday(LocalDate.of(1995, Month.SEPTEMBER, 24));
         user.setName("Пикачу");
@@ -225,7 +212,6 @@ class UserControllerTest {
     @Test
     void removeUnknownFriend() {
         User user = new User("mail@ya.ru", "pika");
-        UserService userService = new UserService(new InMemoryUserStorage());
 
         user.setBirthday(LocalDate.of(1995, Month.SEPTEMBER, 24));
         user.setName("Пикачу");
@@ -246,7 +232,6 @@ class UserControllerTest {
     @Test
     void removeFriendFromUnknownUser() {
         User user = new User("mail@ya.ru", "pika");
-        UserService userService = new UserService(new InMemoryUserStorage());
 
         user.setBirthday(LocalDate.of(1995, Month.SEPTEMBER, 24));
         user.setName("Пикачу");
@@ -267,7 +252,6 @@ class UserControllerTest {
     @Test
     void getFriendOk() {
         User user = new User("mail@ya.ru", "pika");
-        UserService userService = new UserService(new InMemoryUserStorage());
 
         user.setBirthday(LocalDate.of(1995, Month.SEPTEMBER, 24));
         user.setName("Пикачу");
@@ -289,7 +273,6 @@ class UserControllerTest {
     @Test
     void getFriendsFromUnknownUser() {
         User user = new User("mail@ya.ru", "pika");
-        UserService userService = new UserService(new InMemoryUserStorage());
 
         user.setBirthday(LocalDate.of(1995, Month.SEPTEMBER, 24));
         user.setName("Пикачу");
@@ -309,104 +292,102 @@ class UserControllerTest {
 
     @Test
     void getCommonFriendOk() {
-        User user = new User("mail@ya.ru", "pika");
-        UserService userService = new UserService(new InMemoryUserStorage());
+        User user1 = new User("mail@ya.ru", "pika");
 
-        user.setBirthday(LocalDate.of(1995, Month.SEPTEMBER, 24));
-        user.setName("Пикачу");
+        user1.setBirthday(LocalDate.of(1995, Month.SEPTEMBER, 24));
+        user1.setName("Пикачу");
 
-        User user1 = userService.createUser(user);
+        user1 = userService.createUser(user1);
         User user2 = new User("mail2@ya.ru", "pika2");
         user2.setBirthday(LocalDate.of(1998, Month.SEPTEMBER, 14));
         user2.setName("Пикачу2");
-        User user3 = userService.createUser(user2);
+        user2 = userService.createUser(user2);
 
-        User user4 = new User("mail4@ya.ru", "pika4");
-        user2.setBirthday(LocalDate.of(1998, Month.SEPTEMBER, 4));
-        user2.setName("Пикачу4");
-        User user5 = userService.createUser(user4);
+        User user3 = new User("mail4@ya.ru", "pika4");
+        user3.setBirthday(LocalDate.of(1998, Month.SEPTEMBER, 4));
+        user3.setName("Пикачу4");
+        user3 = userService.createUser(user3);
 
-        userService.addFriend(user1.getId(), user3.getId());
-        userService.addFriend(user5.getId(), user3.getId());
-        List<User> commonFriends = userService.getCommonFriends(user1.getId(), user5.getId());
+        userService.addFriend(user1.getId(), user2.getId());
+        userService.addFriend(user3.getId(), user2.getId());
+        List<User> commonFriends = userService.getCommonFriends(user1.getId(), user3.getId());
 
         assertNotNull(commonFriends, "Список друзей пуст");
-        assertEquals(commonFriends.get(0), user3, "Список друзей отличается от ожидаемого");
+        assertEquals(commonFriends.get(0), user2, "Список друзей отличается от ожидаемого");
         assertEquals(commonFriends.size(), 1, "Неверный размер списка друзей");
     }
 
     @Test
     void getCommonFriendFromUnknownUser() {
-        User user = new User("mail@ya.ru", "pika");
-        UserService userService = new UserService(new InMemoryUserStorage());
+        User user1 = new User("mail@ya.ru", "pika");
 
-        user.setBirthday(LocalDate.of(1995, Month.SEPTEMBER, 24));
-        user.setName("Пикачу");
+        user1.setBirthday(LocalDate.of(1995, Month.SEPTEMBER, 24));
+        user1.setName("Пикачу");
 
-        User user1 = userService.createUser(user);
+        user1 = userService.createUser(user1);
         User user2 = new User("mail2@ya.ru", "pika2");
         user2.setBirthday(LocalDate.of(1998, Month.SEPTEMBER, 14));
         user2.setName("Пикачу2");
-        User user3 = userService.createUser(user2);
+        user2 = userService.createUser(user2);
 
-        User user4 = new User("mail4@ya.ru", "pika4");
-        user2.setBirthday(LocalDate.of(1998, Month.SEPTEMBER, 4));
-        user2.setName("Пикачу4");
-        User user5 = userService.createUser(user4);
+        User user3 = new User("mail4@ya.ru", "pika4");
+        user3.setBirthday(LocalDate.of(1998, Month.SEPTEMBER, 4));
+        user3.setName("Пикачу4");
+        user3 = userService.createUser(user3);
 
-        userService.addFriend(user1.getId(), user3.getId());
-        userService.addFriend(user5.getId(), user3.getId());
+        userService.addFriend(user1.getId(), user2.getId());
+        userService.addFriend(user3.getId(), user2.getId());
 
-        RuntimeException ex = assertThrows(RuntimeException.class, () -> userService.getCommonFriends(5, user5.getId()));
+        User finalUser3 = user3;
+        RuntimeException ex = assertThrows(RuntimeException.class, () -> userService.getCommonFriends(5, finalUser3.getId()));
 
         assertEquals("Пользователя с Id = 5 не существует", ex.getMessage());
     }
 
     @Test
     void getCommonFriendFromUnknownOtherUser() {
-        User user = new User("mail@ya.ru", "pika");
-        UserService userService = new UserService(new InMemoryUserStorage());
+        User user1 = new User("mail@ya.ru", "pika");
 
-        user.setBirthday(LocalDate.of(1995, Month.SEPTEMBER, 24));
-        user.setName("Пикачу");
+        user1.setBirthday(LocalDate.of(1995, Month.SEPTEMBER, 24));
+        user1.setName("Пикачу");
 
-        User user1 = userService.createUser(user);
+        user1 = userService.createUser(user1);
         User user2 = new User("mail2@ya.ru", "pika2");
         user2.setBirthday(LocalDate.of(1998, Month.SEPTEMBER, 14));
         user2.setName("Пикачу2");
-        User user3 = userService.createUser(user2);
+        user2 = userService.createUser(user2);
 
-        User user4 = new User("mail4@ya.ru", "pika4");
-        user2.setBirthday(LocalDate.of(1998, Month.SEPTEMBER, 4));
-        user2.setName("Пикачу4");
-        User user5 = userService.createUser(user4);
+        User user3 = new User("mail4@ya.ru", "pika4");
+        user3.setBirthday(LocalDate.of(1998, Month.SEPTEMBER, 4));
+        user3.setName("Пикачу4");
+        user3 = userService.createUser(user3);
 
-        userService.addFriend(user1.getId(), user3.getId());
-        userService.addFriend(user5.getId(), user3.getId());
+        userService.addFriend(user1.getId(), user2.getId());
+        userService.addFriend(user3.getId(), user2.getId());
 
-        RuntimeException ex = assertThrows(RuntimeException.class, () -> userService.getCommonFriends(user1.getId(), 5));
+        User finalUser1 = user1;
+        RuntimeException ex = assertThrows(RuntimeException.class, () -> userService.getCommonFriends(finalUser1.getId(), 5));
 
         assertEquals("Пользователя с Id = 5 не существует", ex.getMessage());
     }
 
     @Test
     void findAllUsersOk() {
-        User user = new User("mail@ya.ru", "pika");
-        UserService userService = new UserService(new InMemoryUserStorage());
+        User user1 = new User("mail@ya.ru", "pika");
 
-        user.setBirthday(LocalDate.of(1995, Month.SEPTEMBER, 24));
-        user.setName("Пикачу");
+        user1.setBirthday(LocalDate.of(1995, Month.SEPTEMBER, 24));
+        user1.setName("Пикачу");
+        userService.createUser(user1);
 
-        User user1 = userService.createUser(user);
         User user2 = new User("mail2@ya.ru", "pika2");
         user2.setBirthday(LocalDate.of(1998, Month.SEPTEMBER, 14));
         user2.setName("Пикачу2");
-        User user3 = userService.createUser(user2);
+        userService.createUser(user2);
 
-        User user4 = new User("mail4@ya.ru", "pika4");
-        user2.setBirthday(LocalDate.of(1998, Month.SEPTEMBER, 4));
-        user2.setName("Пикачу4");
-        User user5 = userService.createUser(user4);
+        User user3 = new User("mail4@ya.ru", "pika4");
+        user3.setBirthday(LocalDate.of(1998, Month.SEPTEMBER, 4));
+        user3.setName("Пикачу4");
+        userService.createUser(user3);
 
         List<User> usersList = userService.findAllUsers();
 
@@ -416,22 +397,11 @@ class UserControllerTest {
 
     @Test
     void findUserByIdOk() {
-        User user = new User("mail@ya.ru", "pika");
-        UserService userService = new UserService(new InMemoryUserStorage());
+        User user1 = new User("mail@ya.ru", "pika");
 
-        user.setBirthday(LocalDate.of(1995, Month.SEPTEMBER, 24));
-        user.setName("Пикачу");
-
-        User user1 = userService.createUser(user);
-        User user2 = new User("mail2@ya.ru", "pika2");
-        user2.setBirthday(LocalDate.of(1998, Month.SEPTEMBER, 14));
-        user2.setName("Пикачу2");
-        User user3 = userService.createUser(user2);
-
-        User user4 = new User("mail4@ya.ru", "pika4");
-        user2.setBirthday(LocalDate.of(1998, Month.SEPTEMBER, 4));
-        user2.setName("Пикачу4");
-        User user5 = userService.createUser(user4);
+        user1.setBirthday(LocalDate.of(1995, Month.SEPTEMBER, 24));
+        user1.setName("Пикачу");
+        user1 = userService.createUser(user1);
 
         User findUser = userService.findUserById(user1.getId());
 
@@ -440,22 +410,6 @@ class UserControllerTest {
 
     @Test
     void findUserByIdWithUnknownId() {
-        User user = new User("mail@ya.ru", "pika");
-        UserService userService = new UserService(new InMemoryUserStorage());
-
-        user.setBirthday(LocalDate.of(1995, Month.SEPTEMBER, 24));
-        user.setName("Пикачу");
-
-        User user1 = userService.createUser(user);
-        User user2 = new User("mail2@ya.ru", "pika2");
-        user2.setBirthday(LocalDate.of(1998, Month.SEPTEMBER, 14));
-        user2.setName("Пикачу2");
-        User user3 = userService.createUser(user2);
-
-        User user4 = new User("mail4@ya.ru", "pika4");
-        user2.setBirthday(LocalDate.of(1998, Month.SEPTEMBER, 4));
-        user2.setName("Пикачу4");
-        User user5 = userService.createUser(user4);
 
         RuntimeException ex = assertThrows(RuntimeException.class, () -> userService.findUserById(10));
 
