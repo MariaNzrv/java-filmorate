@@ -14,7 +14,7 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-abstract public class AbstractFilmStorageTest {
+abstract class AbstractFilmStorageTest {
 
     protected FilmStorage filmStorage;
     protected UserStorage userStorage;

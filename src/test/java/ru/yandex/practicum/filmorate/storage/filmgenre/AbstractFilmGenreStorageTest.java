@@ -12,7 +12,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-abstract public class AbstractFilmGenreStorageTest {
+abstract class AbstractFilmGenreStorageTest {
 
     protected FilmStorage filmStorage;
 

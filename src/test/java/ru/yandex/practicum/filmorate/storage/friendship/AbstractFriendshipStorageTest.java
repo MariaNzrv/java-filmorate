@@ -21,7 +21,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD;
 
-abstract public class AbstractFriendshipStorageTest {
+abstract class AbstractFriendshipStorageTest {
     protected FriendshipStorage friendshipStorage;
     protected UserStorage userStorage;
 

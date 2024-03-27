@@ -8,7 +8,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-abstract public class AbstractGenreStorageTest {
+abstract class AbstractGenreStorageTest {
     protected GenreStorage genreStorage;
 
     @Test
