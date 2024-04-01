@@ -24,4 +24,5 @@ public class Film {
     private Long duration; // продолжительность фильма
     private Set<Integer> likes = new HashSet<>(); // список лайков (состоит из Id пользоваелей, которым понравился фильм)
     private List<Genre> genres = new ArrayList<>(); // список жанров
+    private Rating mpa; // возрастной рейтинг
 }

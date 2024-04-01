@@ -9,14 +9,14 @@ Template repository for Filmorate project.
 
 ```
 SELECT *
-FROM film;
+FROM films;
 ```
 
 Получение фильма по Id:
 
 ```
 SELECT *
-FROM film
+FROM films
 WHERE id = 'Id';
 ```
 
@@ -24,14 +24,14 @@ WHERE id = 'Id';
 
 ```
 SELECT *
-FROM user;
+FROM users;
 ```
 
 Получение пользователя по Id:
 
 ```
 SELECT *
-FROM user
+FROM users
 WHERE id = 'Id';
 ```
 
@@ -40,11 +40,7 @@ WHERE id = 'Id';
 ```
 SELECT friend_id AS friend
 FROM friendship
-WHERE user_id = 'Id'
-UNION
-SELECT user_id AS friend
-FROM friendship
-WHERE friend_id = 'Id';
+WHERE user_id = 'Id';
 ```
 
 Получение списка общих друзей:
@@ -55,30 +51,17 @@ FROM friendship
 WHERE user_id = 'Id_1' AND
       friend_id IN (SELECT friend_id AS friend
                     FROM friendship
-                    WHERE user_id = 'Id_2'
-                    UNION
-                    SELECT user_id AS friend
-                    FROM friendship
-                    WHERE friend_id = 'Id_2')
-UNION
-SELECT user_id AS friend
-FROM friendship
-WHERE friend_id = 'Id_1' AND
-      user_id IN (SELECT friend_id AS friend
-                    FROM friendship
-                    WHERE user_id = 'Id_2'
-                    UNION
-                    SELECT user_id AS friend
-                    FROM friendship
-                    WHERE friend_id = 'Id_2');
+                    WHERE user_id = 'Id_2');
 ```
 
 Получение 10 фильмов с максимальным кол-вом лайков:
 
 ```
-SELECT COUNT(film_id)
+SELECT *
+FROM films
+WHERE id IN (SELECT film_id
 FROM like
 GROUP BY film_id
 ORDER BY COUNT(film_id) DESC
-LIMIT 10;
+LIMIT 10);
 ```
